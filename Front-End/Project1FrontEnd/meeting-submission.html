@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="mainStyle.css">
+    <title>Meeting Creation Form</title>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+          <div class="logo-area">
+            <img src="https://cdnb.artstation.com/p/assets/images/images/014/888/395/large/florian-bar-hawkins-classic-2.jpg?1546103775">
+          </div>
+        </div>
+        <div class="navbar">
+          <div class="navbar-nested">
+            <nav id="navBar"><a href="homepage.html">Home</a><a href="complaint-viewer.html">Complaints</a><a href="meeting-viewer.html">Meetings</a><a href="complaint-submission.html">Submit a Complaint</a></nav>
+          </div>
+        </div>
+        <div class="mainbody">
+            <h1>Create Meeting</h1>
+            <form>
+                <fieldset>
+                    <legend>Meeting Creation</legend>
+                    <label for="inputSummary">Summary:</label>
+                    <input id="inputSummary" type="text" placeholder="" required minlength="3" maxlength="50">
+            
+                    <label for="inputAddress">Address:</label>
+                    <input id="inputAddress" type="text" placeholder="234 Banana Way" required>
+        
+                    <label for="inputTime">Date:</label>
+                    <input id="inputTime" type="date" placeholder="08/24/2022" required>
+                </fieldset>
+        
+                <button>Create</button>
+            </form>
+        </div>
+      </div>
+</body>
+<script src="loginHandler.js"></script>
+<script>
+    const inputSummary = document.getElementById("inputSummary");
+    const inputAddress = document.getElementById("inputAddress");
+    const inputTime = document.getElementById("inputTime");
+
+    document.addEventListener("submit", async event =>{
+        event.preventDefault();
+
+        const summary = inputSummary.value;
+        const address = inputAddress.value;
+        const date = inputTime.value;
+
+        const time = new Date(date).getTime();
+        console.log(time);
+
+        const meeting = {id:0, summary, address, status:'UNRESOLVED', time};
+
+        const response = await fetch("http://localhost:8080/meetings", {
+            method:"POST",
+            body:JSON.stringify(meeting),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
+        if(response.status === 201){
+            alert("Successfully created a meeting");
+            inputSummary.value = "";
+            inputAddress.value = "";
+            inputTime.value = "";
+        }
+        else{
+            alert("Something went wrong.");
+        }
+
+    });
+</script>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="mainStyle.css">
+    <title>Complaint Submission Form</title>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+          <div class="logo-area">
+            <img src="https://cdnb.artstation.com/p/assets/images/images/014/888/395/large/florian-bar-hawkins-classic-2.jpg?1546103775">
+          </div>
+        </div>
+        <div class="navbar">
+          <div class="navbar-nested">
+            <nav id="navBar"><a href="homepage.html">Home</a><a href="complaint-viewer.html">Complaints</a><a href="meeting-viewer.html">Meetings</a><a href="complaint-submission.html">Submit a Complaint</a></nav>
+          </div>
+        </div>
+        <div class="mainbody">
+            <h1>Submit Complaint</h1>
+            <form>
+                <fieldset id="complaintFieldSet">
+                    <legend>Complaint Submission</legend>
+                    <label for="inputSubject">Subject:</label>
+                    <input id="inputSubject" type="text" placeholder="" required minlength="3" maxlength="50">
+            
+                    <label for="inputDesc">Description:</label>
+                    <input id="inputDesc" type="text" placeholder="" required>
+                </fieldset> 
+        
+                <button>Submit</button>
+            </form>
+        </div>
+      </div>
+</body>
+<script src="loginHandler.js"></script>
+<script>
+    const inputSubject = document.getElementById("inputSubject");
+    const inputDesc = document.getElementById("inputDesc");
+    const appUser = JSON.parse(localStorage.getItem("appUser"));
+
+    if(appUser != null)
+    {
+        if(appUser.role === "REGISTERED" || appUser.role === "COUNCIL")
+        {
+            const complaintFieldSet = document.getElementById("complaintFieldSet");
+
+            const meetingLabel = document.createElement("label");
+            meetingLabel.setAttribute("for", "inputMeeting");
+            meetingLabel.innerText = "Meeting ID:";
+            complaintFieldSet.appendChild(meetingLabel);
+
+            const meetingInput = document.createElement("input");
+            meetingInput.id = "inputMeeting";
+            meetingInput.type = "text";
+            meetingInput.value = -1;
+            complaintFieldSet.appendChild(meetingInput);
+        }
+    }
+    document.addEventListener("submit", async event =>{
+        event.preventDefault();
+
+        const subject = inputSubject.value;
+        const description = inputDesc.value;
+        let complaintMeetingId = -1;
+        const meetingIdInput = document.getElementById("inputMeeting");
+        if(meetingIdInput != null){
+                complaintMeetingId = meetingIdInput.value;
+                const complaint = {id:0, subject, description, meetingId:-1, priority:'UNASSIGNED'};
+
+                const response = await fetch(`http://localhost:8080/complaints/${complaintMeetingId}`, {
+                    method:"POST",
+                    body:JSON.stringify(complaint),
+                    headers:{
+                        "Content-Type":"application/json"
+                    }
+                });
+                
+        if(response.status === 201){
+            alert("Successfully submitted a complaint");
+            inputSubject.value = "";
+            inputDesc.value = "";
+        }
+        else{
+            alert("Something went wrong.");
+        }
+
+        }
+        else
+        {
+            const complaint = {id:0, subject, description, meetingId:-1, priority:'UNASSIGNED'};
+
+            const response = await fetch("http://localhost:8080/complaints", {
+                method:"POST",
+                body:JSON.stringify(complaint),
+                headers:{
+                    "Content-Type":"application/json"
+                }
+            });
+            
+        if(response.status === 201){
+            alert("Successfully submitted a complaint");
+            inputSubject.value = "";
+            inputDesc.value = "";
+        }
+        else{
+            alert("Something went wrong.");
+        }
+
+        }
+
+
+    });
+</script>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="mainStyle.css">
+    <title>My Profile</title>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+          <div class="logo-area">
+            <img src="https://cdnb.artstation.com/p/assets/images/images/014/888/395/large/florian-bar-hawkins-classic-2.jpg?1546103775">
+          </div>
+        </div>
+        <div class="navbar">
+          <div class="navbar-nested">
+            <nav id="navBar"><a href="homepage.html">Home</a><a href="complaint-viewer.html">Complaints</a><a href="meeting-viewer.html">Meetings</a><a href="complaint-submission.html">Submit a Complaint</a></nav>
+          </div>
+        </div>
+        <div class="mainbody">
+            <h1>My Profile</h1>
+            <ul id="profileInfo">
+            
+            </ul>
+        
+        </div>
+      </div>
+</body>
+<script src="loginHandler.js"></script>
+<script>
+    const profileInfo = document.getElementById("profileInfo");
+    const appUser = JSON.parse(localStorage.getItem("appUser"));
+
+    function renderPage(){
+
+        const appUserFname = document.createElement("li");
+        appUserFname.innerText = "First Name: " + appUser.fname;
+
+        const appUserLname = document.createElement("li");
+        appUserLname.innerText = "Last Name: " + appUser.lname;
+
+        const appUserUsername = document.createElement("li");
+        appUserUsername.innerText = "Username: " + appUser.username;
+
+        const appUserRole = document.createElement("li");
+        appUserRole.innerText = "Role: " + appUser.role;
+
+        profileInfo.appendChild(appUserFname);
+        profileInfo.appendChild(appUserLname);
+        profileInfo.appendChild(appUserUsername);
+        profileInfo.appendChild(appUserRole);
+    }
+
+    renderPage();
+
+</script>
+</html>

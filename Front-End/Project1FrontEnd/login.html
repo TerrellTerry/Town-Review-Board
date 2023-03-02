@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="mainStyle.css">
+    <title>Login</title>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+          <div class="logo-area">
+            <img src="https://cdnb.artstation.com/p/assets/images/images/014/888/395/large/florian-bar-hawkins-classic-2.jpg?1546103775">
+          </div>
+        </div>
+        <div class="navbar">
+          <div class="navbar-nested">
+            <nav id="navBar"><a href="homepage.html">Home</a><a href="complaint-viewer.html">Complaints</a><a href="meeting-viewer.html">Meetings</a><a href="complaint-submission.html">Submit a Complaint</a></nav>
+          </div>
+        </div>
+        <div class="mainbody">
+            <h2>Login</h2>
+            <form>
+                <fieldset>
+                    <legend>Login</legend>
+        
+                    <label for="username">Username</label>
+                    <input id="username" type="text" placeholder="jim928">
+        
+                    <label for="password">Password</label>
+                    <input id="password" type="password">
+        
+                    <button>Login</button>
+        
+                </fieldset>
+            </form>
+        </div>
+      </div>
+</body>
+<script>
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+
+    document.addEventListener("submit", async event =>{
+        event.preventDefault();
+        
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+        const credentials = {username, password};
+
+        const response = await fetch("http://localhost:8080/login", {
+            method:"POST",
+            body:JSON.stringify(credentials),
+            headers: {
+                'Content-Type':"application/json"
+            }
+        });
+        
+        if(response.status === 200)
+        {
+            const appUser = await response.json();
+            if(appUser.isApproved)
+            {
+                console.log(appUser);
+                alert("login successful!");
+                //Send user to new page
+                window.location = "https://terryblob.z13.web.core.windows.net/project1/complaint-viewer.html"
+                // local storage can be used to cache information
+                appUser.password = null;
+                localStorage.setItem("appUser", JSON.stringify(appUser));
+                localStorage.getItem("appUser");// retrieve item from local storage
+                //localStorage.clear(); // for log out
+
+                // local storage is tied by domain name
+            }
+            else
+            {
+                alert("You must wait for approval before logging in.");
+            }
+        }
+        else if(response.status === 404){
+            alert("Username not found");
+        }
+        else if(response.status === 400)
+        {
+            alert("Password does not match");
+        }
+        else
+        {
+            alert("Could not log in");
+        }
+
+
+    });
+
+
+
+</script>
+</html>

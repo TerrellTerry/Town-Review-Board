@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="mainStyle.css">
+    <link rel="stylesheet" href="table.css">
+    <title>Meetings</title>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+          <div class="logo-area">
+            <img src="https://cdnb.artstation.com/p/assets/images/images/014/888/395/large/florian-bar-hawkins-classic-2.jpg?1546103775">
+          </div>
+        </div>
+        <div class="navbar">
+          <div class="navbar-nested">
+            <nav id="navBar"><a href="homepage.html">Home</a><a href="complaint-viewer.html">Complaints</a><a href="meeting-viewer.html">Meetings</a><a href="complaint-submission.html">Submit a Complaint</a></nav>
+          </div>
+        </div>
+        <div class="mainbody">
+            <h1>Meeting Viewer</h1>
+            <h2>Upcoming Meetings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th><th>Summary</th><th>Address</th><th>Status</th><th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="meetingTableBody">
+        
+                </tbody>
+            </table>
+            <h2>Previous Meetings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th><th>Summary</th><th>Address</th><th>Status</th><th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="pastMeetingTableBody">
+        
+                </tbody>
+            </table>
+        </div>
+      </div>
+</body>
+<script src="loginHandler.js"></script>
+<script>
+    const meetingTableBody = document.getElementById("meetingTableBody");
+    const pastMeetingTableBody = document.getElementById("pastMeetingTableBody");
+
+    async function getMeetings(){
+        const response = await fetch("http://localhost:8080/meetings");
+        const meetings = await response.json();
+        return meetings;
+    }
+
+    async function renderMeetingsTable(meetings){
+
+        const testMeetings = await getMeetings();
+        for(const meeting of testMeetings){
+            console.log(meeting.id);
+            const meetingRow = document.createElement("tr");
+
+            const meetingIdData = document.createElement("td");
+            meetingIdData.innerText = meeting.id;
+
+            const meetingSummaryData = document.createElement("td");
+            meetingSummaryData.innerText = meeting.summary;
+            
+            const meeitngAddressData = document.createElement("td");
+            meeitngAddressData.innerText = meeting.address;
+
+            const meetingStatusData = document.createElement("td");
+            meetingStatusData.innerText = meeting.status;
+
+            const meetingTimeData = document.createElement("td");
+            meetingTimeData.innerText = new Date(meeting.time);
+
+            meetingRow.appendChild(meetingIdData);
+            meetingRow.appendChild(meetingSummaryData);
+            meetingRow.appendChild(meeitngAddressData);
+            meetingRow.appendChild(meetingStatusData);
+            meetingRow.appendChild(meetingTimeData);
+
+            if(Date.now() > meeting.time)
+            {
+                //Past the date
+                pastMeetingTableBody.appendChild(meetingRow);
+            }
+            else
+            {
+                //Is not past the date
+                meetingTableBody.appendChild(meetingRow);
+            }
+        }
+    }
+    
+    renderMeetingsTable();
+</script>
+</html>

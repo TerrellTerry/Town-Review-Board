@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="mainStyle.css">
+    <title>Register Account</title>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+          <div class="logo-area">
+            <img src="https://cdnb.artstation.com/p/assets/images/images/014/888/395/large/florian-bar-hawkins-classic-2.jpg?1546103775">
+          </div>
+        </div>
+        <div class="navbar">
+          <div class="navbar-nested">
+            <nav id="navBar"><a href="homepage.html">Home</a><a href="complaint-viewer.html">Complaints</a><a href="meeting-viewer.html">Meetings</a><a href="complaint-submission.html">Submit a Complaint</a></nav>
+          </div>
+        </div>
+        <div class="mainbody">
+            <h2>Register Account</h2>
+            <form>
+                <fieldset>
+                    <legend>Register Account</legend>
+        
+                    <label for="fname">First Name</label>
+                    <input id="fname" type="text" placeholder="">
+        
+                    <label for="lname">Last Name</label>
+                    <input id="lname" type="text">
+        
+                    <label for="username">Username</label>
+                    <input id="username" type="text" placeholder="jim928">
+        
+                    <label for="password">Password</label>
+                    <input id="password" type="password">
+        
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input id="confirmPassword" type="password">
+                    <button>Register Account</button>
+        
+                </fieldset>
+            </form>
+        </div>
+      </div>
+</body>
+<script>
+    const fnameInput = document.getElementById("fname");
+    const lnameInput = document.getElementById("lname");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const confirmPasswordInput = document.getElementById("confirmPassword");
+
+    document.addEventListener("submit", async event =>{
+        event.preventDefault();
+
+        const fname = fnameInput.value;
+        const lname = lnameInput.value;
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        const newAppUser = {username, password, fname, lname};
+
+
+        if(password !== confirmPassword)
+        {
+            alert("Password does not match.");
+            return;
+        }
+        //Create the account
+        const response = await fetch("http://localhost:8080/appusers", {
+            method:"POST",
+            body:JSON.stringify(newAppUser),
+            headers: {
+                'Content-Type':"application/json"
+            }
+        });
+        
+        if(response.status === 201)
+        {
+            alert("Successfully created an account. You will be notified when your account has been registered.");
+
+            //Send user to new page
+            window.location = "https://terryblob.z13.web.core.windows.net/project1/complaint-viewer.html"
+        }
+        else{
+            alert("Could not create account");
+        }
+
+
+    });
+
+
+
+</script>
+</html>

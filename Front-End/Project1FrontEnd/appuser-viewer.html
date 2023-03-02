@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="mainStyle.css">
+    <link rel="stylesheet" href="table.css">
+    <title>App User Viewer</title>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+          <div class="logo-area">
+            <img src="https://cdnb.artstation.com/p/assets/images/images/014/888/395/large/florian-bar-hawkins-classic-2.jpg?1546103775">
+          </div>
+        </div>
+        <div class="navbar">
+          <div class="navbar-nested">
+            <nav id="navBar"><a href="homepage.html">Home</a><a href="complaint-viewer.html">Complaints</a><a href="meeting-viewer.html">Meetings</a><a href="complaint-submission.html">Submit a Complaint</a></nav>
+          </div>
+        </div>
+        <div class="mainbody">
+            <h1>App User Viewer</h1>
+            <select name="roles" id="roleSelect">
+                <option value="UNREGISTERED">UNREGISTERED</option>
+                <option value="CONSTITUENT">CONSTITUENT</option>
+                <option value="COUNCIL">COUNCIL</option>
+            </select>
+            <button id="sortRoles">Sort</button>
+        
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th><th>First Name</th><th>Last Name</th><th>Current Role</th><th>Promote</th><th>Demote</th>
+                    </tr>
+                </thead>
+                <tbody id="appUserTableBody">
+        
+                </tbody>
+            </table>
+        </div>
+      </div>
+</body>
+<script src="loginHandler.js"></script>
+<script>
+    const appUserTableBody = document.getElementById("appUserTableBody");
+    const roleSelect = document.getElementById("roleSelect");
+    const sortRolesBtn = document.getElementById("sortRoles");
+
+    let roleSort = "UNREGISTERED";
+
+    async function getAppUsers(){
+        const response = await fetch("http://localhost:8080/appusers", {
+            method:"GET",
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
+
+        const appUsers = await response.json();
+        return appUsers;
+    }
+
+    sortRolesBtn.addEventListener("click", event =>{
+        renderAppUsersTable();
+    });
+
+    async function renderAppUsersTable(appUsers){
+        while(appUserTableBody.firstChild){
+            appUserTableBody.removeChild(appUserTableBody.firstChild);
+        }
+        const testAppUsers = await getAppUsers();
+        console.log(testAppUsers);
+        roleSort = roleSelect.value;
+        for(const appUser of testAppUsers){
+            if(appUser.role === roleSort)
+            {
+                const appUserRow = document.createElement("tr");
+
+                const appUserUsername = document.createElement("td");
+                appUserUsername.innerText = appUser.username;
+
+                const appUserFirstName = document.createElement("td");
+                appUserFirstName.innerText = appUser.fname;
+            
+                const appUserLastName = document.createElement("td");
+                appUserLastName.innerText = appUser.lname;
+
+                const appUserRole = document.createElement("td");
+                appUserRole.innerText = appUser.role;
+
+                const promoteBtn = document.createElement("button");
+                promoteBtn.id = "promoteRole";
+                promoteBtn.innerText = "Promote";
+                promoteBtn.dataset.appUserUsername = appUser.username;
+
+                const demoteBtn = document.createElement("button");
+                demoteBtn.id = "demoteRole";
+                demoteBtn.innerText = "Demote";
+                demoteBtn.dataset.appUserUsername = appUser.username;
+
+                appUserRow.appendChild(appUserUsername);
+                appUserRow.appendChild(appUserFirstName);
+                appUserRow.appendChild(appUserLastName);
+                appUserRow.appendChild(appUserRole);
+                appUserRow.appendChild(promoteBtn);
+                appUserRow.appendChild(demoteBtn);
+
+                appUserTableBody.appendChild(appUserRow);
+            }
+        }
+    }
+
+    document.addEventListener("click", event=>{
+        const element = event.target;
+        const appUserUsername = element.dataset.appUserUsername;
+        const appUser = JSON.parse(localStorage.getItem("appUser"));
+        if(element.id === "promoteRole"){
+            if(roleSort === "UNREGISTERED")
+            {
+                sendRequest(appUserUsername, "CONSTITUENT");
+            }
+            else if(roleSort === "CONSTITUENT"){
+                sendRequest(appUserUsername, "COUNCIL");
+            }
+            else if(roleSort === "COUNCIL"){
+                if(appUser.username === appUserUsername)
+                {
+                    alert("You cannot adjust your own user's role");
+                }
+                else
+                {
+                    alert("Cannot promote the role COUNCIL, because it is the highest role.");
+                }
+            }
+        }
+        else if(element.id === "demoteRole")
+        {
+            if(roleSort === "UNREGISTERED")
+            {
+                alert("Cannot demote the role UNREGISTERED, because it is the lowest role.")
+            }
+            else if(roleSort === "CONSTITUENT"){
+                sendRequest(appUserUsername, "UNREGISTERED");
+            }
+            else if(roleSort === "COUNCIL"){
+                if(appUser.username === appUserUsername)
+                {
+                    alert("You cannot adjust your own user's role");
+                }
+                else
+                {
+                    sendRequest(appUserUsername, "CONSTITUENT");
+                }
+            }
+        }
+
+    });
+
+    async function sendRequest(username, role)
+    {
+        const response = await fetch(`http://localhost:8080/appusers/${username}/${role}`, {
+            method:"PATCH",
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
+
+        if(response.status === 200){
+            alert("Successfully updated user role");
+            renderAppUsersTable();
+        }
+        else
+        {
+            alert("Something went wrong. Could not update user role.")
+        }
+    }
+    
+    renderAppUsersTable();
+</script>
+</html>
