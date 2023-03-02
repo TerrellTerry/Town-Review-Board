@@ -6,6 +6,6 @@ Username to login: username
 
 Password to login: password
 
-It can take about 2-3 minutes to login (it needs to boot up the container running on Azure) and then to view students, click on the students tab. (This can also take up to 2-3 minutes for the same reason.
+It can take about 2-3 minutes to login (it needs to boot up the container running on Azure) and then to view students, click on the students tab. (This can also take up to 2-3 minutes for the same reason.)
 
 Created at Revature.
